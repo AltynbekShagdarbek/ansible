@@ -1,0 +1,42 @@
+---
+- name: Install and configure Docker and PostgreSQL
+  hosts: all
+  vars:
+    postgres_version: 12
+    postgres_data_directory: /var/lib/pgsql/{{ postgres_version }}/data
+  tasks:
+  - name: Install Docker
+    package:
+      name: docker
+      state: present
+    when: "'app' in group_names"
+
+  - name: Start and enable Docker service
+    service:
+      name: docker
+      state: started
+      enabled: true
+    when: "'app' in group_names"
+
+  - name: Install PostgreSQL
+    package:
+      name: postgresql{{ postgres_version }}-server
+      state: present
+    when: "'database' in group_names"
+
+  - name: Start and enable PostgreSQL service
+    service:
+      name: postgresql-{{ postgres_version }}
+      state: started
+      enabled: true
+    when: "'database' in group_names"
+
+  - name: Configure PostgreSQL data directory
+    shell: "sed -i 's,data_directory =.*,data_directory = {{ postgres_data_directory }},g' /var/lib/pgsql/{{ postgres_version }}/data/postgresql.conf"
+    when: "'database' in group_names"
+
+  - name: Restart PostgreSQL service
+    service:
+      name: postgresql-{{ postgres_version }}
+      state: restarted
+    when: "'database' in group_names"
