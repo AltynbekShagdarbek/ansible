@@ -1,0 +1,16 @@
+- name: Create superusers group
+  become: true
+  become_user: root
+  user:
+    name: user2
+    groups: superusers
+    append: true
+  user:
+    name: user3
+    groups: superusers
+    append: true
+  lineinfile:
+    path: /etc/sudoers
+    regexp: '^%superusers'
+    line: '%superusers ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
