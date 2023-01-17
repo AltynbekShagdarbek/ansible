@@ -1,0 +1,15 @@
+- name: Configure dnsmasq
+  become: true
+  become_user: root
+  package:
+    name: dnsmasq
+    state: present
+  template:
+    src: dnsmasq.conf.j2
+    dest: /etc/dnsmasq.conf
+    owner: root
+    group: root
+    mode: 0644
+  service:
+    name: dnsmasq
+    state: restarted

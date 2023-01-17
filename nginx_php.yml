@@ -1,0 +1,38 @@
+- name: Configure nginx and php-fpm
+  become: true
+  become_user: root
+  package:
+    - name: nginx
+      state: present
+    - name: php-fpm
+      state: present
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: 0644
+  template:
+    src: default.conf.j2
+    dest: /etc/nginx/sites-enabled/default
+    owner: root
+    group: root
+    mode: 0644
+  file:
+    path: /opt/nginx/ansible/index.php
+    state: touch
+    owner: root
+    group: root
+    mode: 0644
+  lineinfile:
+    path: /opt/nginx/ansible/index.php
+    line: "<?php phpinfo();?>"
+  service:
+    name: nginx
+    state: restarted
+
+  handlers:
+  - name: Reload nginx
+    service:
+      name: nginx
+      state: reloaded

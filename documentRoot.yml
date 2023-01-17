@@ -1,0 +1,9 @@
+- name: Update nginx DocumentRoot
+  become: true
+  become_user: root
+  lineinfile:
+    path: /etc/nginx/sites-enabled/default
+    regexp: '^root /var/www/html'
+    line: 'root /opt/nginx/ansible'
+    notify:
+      - Reload nginx
